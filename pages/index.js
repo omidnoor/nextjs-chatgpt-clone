@@ -6,15 +6,31 @@ export default function Home() {
   const { isLoading, error, user } = useUser();
 
   return (
-    <div>
+    <>
       <Head>
-        <title>Next JS ChatGPT Starter</title>
+        <title>MemoAI - Login or Signup</title>
       </Head>
-      <h1>Welcome to the Next JS &amp; ChatGPT Starter</h1>
-      <div>
-        {!!user && <Link href="/api/auth/logout">Logout</Link>}
-        {!user && <Link href="/api/auth/login">Login</Link>}
+      <div className="flex min-h-screen w-full items-center justify-center bg-gray-800 text-center text-white">
+        <div>
+          {!!user && <Link href="/api/auth/logout">Logout</Link>}
+          {!user && (
+            <>
+              <Link
+                href="/api/auth/login"
+                className="rounded-md bg-emerald-500 px-4 py-2 text-white hover:bg-emerald-600"
+              >
+                Login
+              </Link>
+              <Link
+                href="/api/auth/signup"
+                className="rounded-md bg-emerald-500 px-4 py-2 text-white hover:bg-emerald-600"
+              >
+                Signup
+              </Link>
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

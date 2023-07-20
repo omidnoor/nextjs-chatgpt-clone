@@ -8,23 +8,17 @@ export default async function handler(req, res, next) {
   try {
     const { message } = await req.json();
     const stream = await OpenAIEdgeStream(
-      `https://api.openai.com/v1/chat/completions`,
+      "https://api.openai.com/v1/chat/completions",
       {
         headers: {
-          "Content-Type": "application/json",
+          "content-type": "application/json",
           Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
         },
         method: "POST",
         body: JSON.stringify({
           model: "gpt-3.5-turbo",
-          messages: [
-            {
-              content: message,
-              role: "user",
-            },
-          ],
+          messages: [{ role: "user", content: message }],
           stream: true,
-          temprature: 0.9,
         }),
       }
     );

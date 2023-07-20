@@ -11,7 +11,7 @@ export default function Home() {
       <Head>
         <title>MemoAI - Login or Signup</title>
       </Head>
-      <div className="flex min-h-screen w-full items-center justify-center bg-gray-800 text-center text-white">
+      <div className="flex min-h-screen w-full items-center justify-center gap-2 bg-gray-800 text-center text-white">
         <div>
           {!!user && <Link href="/api/auth/logout">Logout</Link>}
           {!user && (

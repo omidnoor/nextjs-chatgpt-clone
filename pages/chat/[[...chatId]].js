@@ -41,7 +41,7 @@ export default function ChatPage() {
       setIncomingMessage((s) => `${s}${message.content}`);
     });
   };
-  console.log(incomingMessage);
+
   return (
     <>
       <Head>

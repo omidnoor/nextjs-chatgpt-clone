@@ -1,5 +1,4 @@
 import { useUser } from "@auth0/nextjs-auth0/client";
-import { FontAwesomeIcon } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
 import { BsRobot } from "react-icons/bs";
 
@@ -13,7 +12,7 @@ const Message = ({ role, content }) => {
       }`}
     >
       <div className="">
-        {role === "user" && (
+        {role === "user" && !!user && (
           <Image
             src={user.picture}
             width={30}

@@ -1,6 +1,7 @@
 import { useUser } from "@auth0/nextjs-auth0/client";
 import Image from "next/image";
 import { BsRobot } from "react-icons/bs";
+import ReactMarkdown from "react-markdown";
 
 const Message = ({ role, content }) => {
   const { user } = useUser();
@@ -30,7 +31,9 @@ const Message = ({ role, content }) => {
           </div>
         )}
       </div>
-      <div className="">{content}</div>
+      <div className="prose prose-invert">
+        <ReactMarkdown>{content}</ReactMarkdown>
+      </div>
     </div>
   );
 };

@@ -2,13 +2,27 @@ import ChatSidebar from "components/ChatSidebar";
 import Head from "next/head";
 import { useState } from "react";
 import { streamReader } from "openai-edge-stream";
+import { v4 as uuid } from "uuid";
+import Message from "components/Message/Message";
 
 export default function ChatPage() {
   const [messageText, setMessageText] = useState("");
   const [incomingMessage, setIncomingMessage] = useState("");
+  const [newChatMessages, setNewChatMessages] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setNewChatMessages((prev) => {
+      const newChatMessages = [
+        ...prev,
+        {
+          _id: uuid(),
+          role: "user",
+          content: messageText,
+        },
+      ];
+      return newChatMessages;
+    });
     const response = await fetch("/api/chat/sendMessage", {
       method: "POST",
       headers: {
@@ -22,12 +36,12 @@ export default function ChatPage() {
     const data = response.body;
     if (!data) return;
     const reader = data.getReader();
-    console.log(response);
+
     await streamReader(reader, (message) => {
       setIncomingMessage((s) => `${s}${message.content}`);
     });
   };
-
+  console.log(incomingMessage);
   return (
     <>
       <Head>
@@ -36,7 +50,18 @@ export default function ChatPage() {
       <div className="grid h-screen grid-cols-[260px_1fr]">
         <ChatSidebar />
         <div className="flex flex-col bg-gray-700">
-          <div className="flex-1 text-white">{incomingMessage}</div>
+          <div className="flex-1 text-white">
+            {newChatMessages?.map((message, index) => (
+              <Message
+                key={message._id}
+                role={message.role}
+                content={message.content}
+              />
+            ))}
+            {!!incomingMessage && (
+              <Message role="assistant" content={incomingMessage} />
+            )}
+          </div>
           <footer className=" bg-gray-800 p-10">
             <form onSubmit={handleSubmit}>
               <fieldset className="flex gap-2">

@@ -21,7 +21,6 @@ export default async function handler(req, res) {
         .json({ message: "Too many requests, please try again later." });
     } else {
       const { user } = await getSession(req, res);
-      console.log("user: ", user);
       const { message } = req.body;
       const newUserMessage = {
         role: "user",
@@ -36,7 +35,7 @@ export default async function handler(req, res) {
       });
 
       res.status(200).json({
-        _is: chat.insertedId.toString(),
+        _id: chat.insertedId.toString(),
         messages: [newUserMessage],
         title: message,
       });

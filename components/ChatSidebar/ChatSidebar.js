@@ -5,6 +5,7 @@ import { BsFillChatSquareFill } from "react-icons/bs";
 
 const ChatSidebar = () => {
   const [chatList, setChatList] = useState([]);
+
   useEffect(() => {
     const loadChatList = async () => {
       const response = await fetch("/api/chat/getChatList", {
@@ -15,6 +16,7 @@ const ChatSidebar = () => {
     };
     loadChatList();
   }, []);
+
   return (
     <div className="flex flex-col overflow-hidden bg-gray-900 text-white">
       <Link
@@ -31,7 +33,7 @@ const ChatSidebar = () => {
             key={chat._id}
             className="side-menu-item"
           >
-            <BsFillChatSquareFill size={20} />
+            <BsFillChatSquareFill size={20} className="p-0" />
             {chat.title}
           </Link>
         ))}

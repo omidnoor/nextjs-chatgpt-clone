@@ -43,9 +43,9 @@ export default async function handler(req) {
         }),
       },
       {
-        // onBeforeStream: async ({ emit, fullcontent }) => {
-        //   emit(chatId, "newChatId");
-        // },
+        onBeforeStream: async ({ emit, fullcontent }) => {
+          emit(chatId, "newChatId");
+        },
         onAfterStream: async ({ fullContent }) => {
           try {
             await fetch(

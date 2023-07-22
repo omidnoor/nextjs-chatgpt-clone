@@ -16,7 +16,10 @@ export default function ChatPage({ chatId, title, messages = [] }) {
   const [generatingResponse, setGeneratingResponse] = useState(false);
   const [newChatId, setNewChatId] = useState(null);
   const [fullMessage, setFullMessage] = useState("");
+  const [originalChatId, setOriginalChatId] = useState(chatId);
   const router = useRouter();
+
+  const routeHasChanged = chatId !== originalChatId;
 
   // when our route changes
   useEffect(() => {
@@ -26,7 +29,7 @@ export default function ChatPage({ chatId, title, messages = [] }) {
 
   // save newly streamed messages to new chat messages
   useEffect(() => {
-    if (!generatingResponse && fullMessage) {
+    if (!routeHasChanged && !generatingResponse && fullMessage) {
       setNewChatMessages((prev) => [
         ...prev,
         {
@@ -37,7 +40,7 @@ export default function ChatPage({ chatId, title, messages = [] }) {
       ]);
       setFullMessage("");
     }
-  }, [generatingResponse, fullMessage]);
+  }, [generatingResponse, fullMessage, routeHasChanged]);
 
   // if we have created new chat
   useEffect(() => {
@@ -50,6 +53,7 @@ export default function ChatPage({ chatId, title, messages = [] }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setGeneratingResponse(true);
+    setOriginalChatId(chatId);
     setNewChatMessages((prev) => {
       const newChatMessages = [
         ...prev,
@@ -109,8 +113,14 @@ export default function ChatPage({ chatId, title, messages = [] }) {
                 content={message.content}
               />
             ))}
-            {!!incomingMessage && (
+            {!!incomingMessage && !routeHasChanged && (
               <Message role="assistant" content={incomingMessage} />
+            )}
+            {!!incomingMessage && !!routeHasChanged && (
+              <Message
+                role="notice"
+                content="Wait! Only one message at a time. Please allow anymother responses to complete before sending another message!"
+              />
             )}
           </div>
           <footer className=" bg-gray-800 p-10">

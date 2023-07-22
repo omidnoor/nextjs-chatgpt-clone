@@ -6,27 +6,70 @@ export const config = {
 
 export default async function handler(req) {
   try {
-    const { message } = await req.json();
+    const { chatId: chatIdFromParam, message } = await req.json();
+    let chatId = chatIdFromParam;
+    let newChatId;
+    let chatMessages = [];
+
     const initialChatMessage = {
       role: "system",
-      content: `Your name is Memo. You are incredibly inteligent and quick-thinking scientist AI, that always replies an enthusiastic and positive energy but if you do not know the answer you say that you do not know the answer and you refer the user to search it in an engine like Google. You were created by ONext Dev. Your responses must be formatted as markdown. if the user ask your name you also ask their name. if someone's name is includes "Amir" or "Amirreza" or "Amireza" or "amir" or "amirreza" or "amireza" you must response this text "Kir am to koone ammeye Siamak". `,
+      content: `Your name is Memo. You are incredibly inteligent and quick-thinking scientist AI, that always replies an enthusiastic and positive energy. You were created by ONext Dev. Your responses must be formatted as markdown. you recieve a conversation and you must answer the last question based on your knowledge and the conversation history you have recieved.`,
     };
 
-    const response = await fetch(
-      `${req.headers.get("origin")}/api/chat/createNewChat`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          cookie: req.headers.get("cookie"),
-        },
-        body: JSON.stringify({
-          message,
-        }),
+    // if the user ask your name you also ask their name. if someone's name is includes "Amir" or "Amirreza" or "Amireza" or "amir" or "amirreza" or "amireza" you must response this text "Kir am to koone ammeye Siamak
+
+    if (chatId) {
+      const response = await fetch(
+        `${req.headers.get("origin")}/api/chat/addMessageToChat`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            cookie: req.headers.get("cookie"),
+          },
+          body: JSON.stringify({
+            chatId,
+            role: "user",
+            content: message,
+          }),
+        }
+      );
+      const json = await response.json();
+      chatMessages = json.chat.messages || [];
+    } else {
+      const response = await fetch(
+        `${req.headers.get("origin")}/api/chat/createNewChat`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            cookie: req.headers.get("cookie"),
+          },
+          body: JSON.stringify({
+            message,
+          }),
+        }
+      );
+      const json = await response.json();
+      chatId = json._id;
+      newChatId = json._id;
+      chatMessages = json.messages || [];
+    }
+
+    const messagesToInclude = [];
+    chatMessages.reverse();
+    let usedTokens = 0;
+    for (let chatMessage of chatMessages) {
+      const messageTokens = chatMessage.content.length / 4;
+      usedTokens = usedTokens + messageTokens;
+      if (usedTokens <= 2000) {
+        messagesToInclude.push(chatMessage);
+      } else {
+        break;
       }
-    );
-    const json = await response.json();
-    const chatId = json._id;
+    }
+
+    messagesToInclude.reverse();
 
     const stream = await OpenAIEdgeStream(
       "https://api.openai.com/v1/chat/completions",
@@ -38,13 +81,15 @@ export default async function handler(req) {
         method: "POST",
         body: JSON.stringify({
           model: "gpt-3.5-turbo",
-          messages: [initialChatMessage, { role: "user", content: message }],
+          messages: [initialChatMessage, ...messagesToInclude],
           stream: true,
         }),
       },
       {
         onBeforeStream: async ({ emit, fullcontent }) => {
-          emit(chatId, "newChatId");
+          if (newChatId) {
+            emit(chatId, "newChatId");
+          }
         },
         onAfterStream: async ({ fullContent }) => {
           try {

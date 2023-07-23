@@ -19,9 +19,18 @@ export default async function handler(req, res) {
       res
         .status(429)
         .json({ message: "Too many requests, please try again later." });
+      return;
     } else {
       const { user } = await getSession(req, res);
       const { message } = req.body;
+
+      if (!message || typeof message !== "string" || message.length > 200) {
+        res.status(422).json({
+          message: "Message is required and must be less than 200 characters",
+        });
+        return;
+      }
+
       const newUserMessage = {
         role: "user",
         content: message,

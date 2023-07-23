@@ -26,19 +26,21 @@ export const ChatSidebar = ({ chatId }) => {
         <AiOutlinePlus />
         New chat
       </Link>
-      <div className=" flex-1  overflow-auto bg-gray-950">
+      <div className="   overflow-auto bg-gray-950">
         {chatList?.map((chat) => (
           <Link
             href={`/chat/${chat._id}`}
             key={chat._id}
-            className={`side-menu-item ${
+            className={`side-menu-item  ${
               chatId === chat._id ? "bg-gray-700 hover:bg-gray-700" : ""
             }`}
           >
-            <BsFillChatSquareFill size={20} className="p-0" />
+            <div>
+              <BsFillChatSquareFill size={20} className="p-0 text-white/50" />
+            </div>
             <span
               title={chat.title}
-              className="overflow-hidden text-ellipsis whitespace-nowrap"
+              className="overflow-hidden text-ellipsis whitespace-nowrap "
             >
               {chat.title}
             </span>

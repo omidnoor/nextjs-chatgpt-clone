@@ -8,6 +8,7 @@ import { ChatSidebar } from "components/ChatSidebar";
 import { getSession } from "@auth0/nextjs-auth0";
 import clientPromise from "lib/mongodb";
 import { ObjectId } from "mongodb";
+import { BsRobot } from "react-icons/bs";
 
 export default function ChatPage({ chatId, title, messages = [] }) {
   const [messageText, setMessageText] = useState("");
@@ -106,23 +107,33 @@ export default function ChatPage({ chatId, title, messages = [] }) {
         <ChatSidebar chatId={chatId} />
         <div className="flex flex-col overflow-hidden bg-gray-700">
           <div className="flex flex-1 flex-col-reverse overflow-auto text-white">
-            <div className="mb-auto">
-              {allMessages?.map((message, index) => (
-                <Message
-                  key={message._id}
-                  role={message.role}
-                  content={message.content}
-                />
-              ))}
-              {!!incomingMessage && !routeHasChanged && (
-                <Message role="assistant" content={incomingMessage} />
-              )}
-            </div>
-            {!!incomingMessage && !!routeHasChanged && (
-              <Message
-                role="notice"
-                content="Wait! Only one message at a time. Please allow anymother responses to complete before sending another message!"
-              />
+            {!allMessages.length && !incomingMessage && (
+              <div className="m-auto flex flex-col items-center justify-center gap-1 text-center">
+                <BsRobot size={70} className="p-1 text-emerald-200" />
+                <h1 className="text-4xl font-bold text-white/50">
+                  Ask me a quetion!
+                </h1>
+              </div>
+            )}
+            {!!allMessages.length && (
+              <div className="mb-auto">
+                {allMessages?.map((message, index) => (
+                  <Message
+                    key={message._id}
+                    role={message.role}
+                    content={message.content}
+                  />
+                ))}
+                {!!incomingMessage && !routeHasChanged && (
+                  <Message role="assistant" content={incomingMessage} />
+                )}
+                {!!incomingMessage && !!routeHasChanged && (
+                  <Message
+                    role="notice"
+                    content="Wait! Only one message at a time. Please allow anymother responses to complete before sending another message!"
+                  />
+                )}
+              </div>
             )}
           </div>
           <footer className=" bg-gray-800 p-10">

@@ -105,17 +105,19 @@ export default function ChatPage({ chatId, title, messages = [] }) {
       <div className="grid h-screen grid-cols-[260px_1fr]">
         <ChatSidebar chatId={chatId} />
         <div className="flex flex-col overflow-hidden bg-gray-700">
-          <div className="flex-1 overflow-auto text-white">
-            {allMessages?.map((message, index) => (
-              <Message
-                key={message._id}
-                role={message.role}
-                content={message.content}
-              />
-            ))}
-            {!!incomingMessage && !routeHasChanged && (
-              <Message role="assistant" content={incomingMessage} />
-            )}
+          <div className="flex flex-1 flex-col-reverse overflow-auto text-white">
+            <div className="mb-auto">
+              {allMessages?.map((message, index) => (
+                <Message
+                  key={message._id}
+                  role={message.role}
+                  content={message.content}
+                />
+              ))}
+              {!!incomingMessage && !routeHasChanged && (
+                <Message role="assistant" content={incomingMessage} />
+              )}
+            </div>
             {!!incomingMessage && !!routeHasChanged && (
               <Message
                 role="notice"
